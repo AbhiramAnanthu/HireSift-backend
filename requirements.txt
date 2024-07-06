@@ -2,3 +2,4 @@ Django
 langchain
 langchain-google-genai
 python-dotenv
+pypdf

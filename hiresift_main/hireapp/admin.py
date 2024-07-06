@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import Resume
+from .models import ApplicantData
 
-admin.site.register(Resume)
+admin.site.register(ApplicantData)

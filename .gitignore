@@ -3,3 +3,4 @@
 hiresift_main/hireapp/__pycache__
 hiresift_main/hireapp/migrations
 hiresift_main/db.sqlite3
+hiresift_main/media
