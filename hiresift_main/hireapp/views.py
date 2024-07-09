@@ -3,40 +3,55 @@ from django.http import HttpResponse
 from .models import ApplicantData
 from .resume import document_loader, scanning, vector, vector_search
 from .forms import ApplicantForm
-
+import os
+import uuid
 
 def main(request):
-    result=searching()
+    result = searching()
     return render(request, "result.html", {"result": result})
 
+
 def vector_storing():
-    content=documentation()
-    id=content.get('id')
-    result=content.get('result')
+    data=[]
     document=[]
-    document.append(vector(id,result))
-    return {
-        "document":document,
-        "id":id,
-        "file_path":content.get('file_path')
-    }
+    applicants = documentation()
+    for applicant in applicants:
+        id = applicant.get("id")
+        result = applicant.get("result")
+        document.append(vector(result))
+        resume_data = {
+            "document":document,
+            "id":id,
+            "file_path":applicant.get('file_path')
+        }
+        data.append(resume_data)
+    return data
+
 
 def searching():
-    loader=vector_storing()
-    document=loader['document']
-    id=loader['id']
-    file_path=loader['file_path']
-    search_results=vector_search(document,file_path)
+    data = vector_storing()
+    search_results=[]
+    for doc in data:
+        document = doc.get("document")
+        file_path = doc.get("file_path")
+        search_results.append(vector_search(document, file_path))
     return search_results
+
+def generate_application_number():
+    return str(uuid.uuid4()).replace('-', '').upper()[:10]
 
 def formSubmition(request):
     if request.method == "POST":
         form = ApplicantForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect("success")
+            applicant=form.save(commit=False)
+            application_number=generate_application_number()
+            applicant.application_number = application_number
+            applicant.save()
 
-    else:
+            return redirect("success",application_number=application_number)
+
+    else: 
         form = ApplicantForm()
 
     return render(request, "upload_resume.html", {"form": form})
@@ -44,11 +59,20 @@ def formSubmition(request):
 
 def documentation():
     applicants = ApplicantData.objects.all()
-    content = {}
+    content = []
     for applicant in applicants:
         file_name = applicant.get_file_name()
-        file_path = f"C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media/{file_name}"
-        loader=scanning(file_path)
-        content.update({"id": applicant.application_number, "file_path": file_path,'result':loader["result"]})
+        file_path = os.path.join(
+            "C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media",
+            file_name,
+        )
+        loader = scanning(file_path)
+        dict={
+            "file_path": file_path,
+            "result": loader["result"],
+            "id":applicant.application_number
+        }
+        content.append(dict)
+
     return content
 

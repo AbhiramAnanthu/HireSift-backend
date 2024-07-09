@@ -22,9 +22,8 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('uploads',include("hireapp.urls")),
-    path('success/', TemplateView.as_view(template_name='success_page.html'), name='success'),
-    path('result/',include('hireapp.urls'))
+    path('hireapp/',include("hireapp.urls")),
+    path('success/<str:application_number>/', TemplateView.as_view(template_name='success_page.html'), name='success'),
 ]
 
 if settings.DEBUG:

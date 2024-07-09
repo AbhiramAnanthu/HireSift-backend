@@ -10,10 +10,6 @@ class ApplicantData(models.Model):
     upload_time = models.DateTimeField(auto_now_add=True,null=True)
     appl_email=models.EmailField()
     appl_phone=models.CharField(max_length=15)
-
-    def setApplication(self):
-        if not self.application_number:
-            self.application_number = get_random_string(12).upper()
             
     def get_file_name(self):
         return os.path.basename(self.resume.name)

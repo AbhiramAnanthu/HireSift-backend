@@ -46,10 +46,9 @@ def scanning(file_path):
         "prompt":f"{prompt.get('resume')} is a resume of an applicant.{prompt.get('user_prompt')}"
     }
 
-def vector(id,content):
+def vector(content):
     return Document(
         page_content=content,
-        # metadata={"id":id}
     )
 
 def vector_search(document,file_path):
@@ -61,4 +60,4 @@ def vector_search(document,file_path):
     # query_vector=embeddings.embed_query(user_quer_text)
     #print(user_quer_text)
     docs= store.similarity_search(user_quer_text)
-    return docs[0].metadata
+    return docs[0].page_content
