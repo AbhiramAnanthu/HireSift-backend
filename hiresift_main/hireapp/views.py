@@ -1,41 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import ApplicantData
-from .resume import document_loader, scanning, vector, vector_search
+from .resume import  scanning,filtering
 from .forms import ApplicantForm
 import os
 import uuid
 
 def main(request):
-    result = searching()
+    result = ranking()
     return render(request, "result.html", {"result": result})
-
-
-def vector_storing():
-    data=[]
-    document=[]
-    applicants = documentation()
-    for applicant in applicants:
-        id = applicant.get("id")
-        result = applicant.get("result")
-        document.append(vector(result))
-        resume_data = {
-            "document":document,
-            "id":id,
-            "file_path":applicant.get('file_path')
-        }
-        data.append(resume_data)
-    return data
-
-
-def searching():
-    data = vector_storing()
-    search_results=[]
-    for doc in data:
-        document = doc.get("document")
-        file_path = doc.get("file_path")
-        search_results.append(vector_search(document, file_path))
-    return search_results
 
 def generate_application_number():
     return str(uuid.uuid4()).replace('-', '').upper()[:10]
@@ -76,3 +49,11 @@ def documentation():
 
     return content
 
+
+def ranking():
+    results = documentation()
+    rank_container=[]
+    for result in results:
+        rank = filtering(result)
+        rank_container.append(rank)
+    return rank_container
