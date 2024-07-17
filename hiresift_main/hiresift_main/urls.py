@@ -19,11 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.urls import path,include
+from hireapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hireapp/',include("hireapp.urls")),
-    path('success/<str:application_number>/', TemplateView.as_view(template_name='success_page.html'), name='success'),
+    path('',JobView.as_view(),name='job-view'),
 ]
 
 if settings.DEBUG:

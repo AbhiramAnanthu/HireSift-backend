@@ -1,59 +1,21 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import ApplicantData
-from .resume import  scanning,filtering
-from .forms import ApplicantForm
-import os
-import uuid
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import EmployeeSerializer
+from rest_framework import status
+from .forms import JobForm
+from .models import *
 
-def main(request):
-    result = ranking()
-    return render(request, "result.html", {"result": result})
-
-def generate_application_number():
-    return str(uuid.uuid4()).replace('-', '').upper()[:10]
-
-def formSubmition(request):
-    if request.method == "POST":
-        form = ApplicantForm(request.POST, request.FILES)
-        if form.is_valid():
-            applicant=form.save(commit=False)
-            application_number=generate_application_number()
-            applicant.application_number = application_number
-            applicant.save()
-
-            return redirect("success",application_number=application_number)
-
-    else: 
-        form = ApplicantForm()
-
-    return render(request, "upload_resume.html", {"form": form})
-
-
-def documentation():
-    applicants = ApplicantData.objects.all()
-    content = []
-    for applicant in applicants:
-        file_name = applicant.get_file_name()
-        file_path = os.path.join(
-            "C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media",
-            file_name,
-        )
-        loader = scanning(file_path)
-        dict={
-            "file_path": file_path,
-            "result": loader["result"],
-            "id":applicant.application_number
-        }
-        content.append(dict)
-
-    return content
-
-
-def ranking():
-    results = documentation()
-    rank_container=[]
-    for result in results:
-        rank = filtering(result)
-        rank_container.append(rank)
-    return rank_container
+class JobView(APIView):
+    def get(self,request):
+        job=EmployeeForm.objects.all()
+        serializer=EmployeeSerializer(job,many=True)
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = EmployeeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
