@@ -13,6 +13,7 @@ class JobView(APIView):
         return Response(serializer.data)
     
     def post(self,request):
+        print(request.data)
         serializer = EmployeeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -1,12 +1,13 @@
 from django.db import models
+from django.utils import timezone
 import os
 
 
 class EmployeeForm(models.Model):
-    job_title = models.CharField(max_length=100, null=True)
-    job_description = models.TextField(max_length=400, null=True)
-    starting_date = models.DateField(auto_now_add=True)
-    ending_date = models.DateField(auto_now_add=True)
+    job_title = models.CharField(max_length=255,null=False,blank=True)
+    job_description = models.TextField()
+    starting_date = models.DateField(default=timezone.now)
+    ending_date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.job_title

@@ -4,4 +4,4 @@ from .models import EmployeeForm
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model=EmployeeForm
-        fields = ['job_title','job_description','starting_date','ending_date']
+        fields = '__all__'
