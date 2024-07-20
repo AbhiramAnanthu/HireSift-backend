@@ -23,7 +23,7 @@ from hireapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',JobView.as_view(),name='job-view'),
+    path('',include('hireapp.urls')),
 ]
 
 if settings.DEBUG:
