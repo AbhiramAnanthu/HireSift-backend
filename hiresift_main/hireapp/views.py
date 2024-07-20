@@ -3,12 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import EmployeeSerializer
 from rest_framework import status
-from .forms import JobForm
 from .models import *
 
 class JobView(APIView):
     def get(self,request):
-        job=EmployeeForm.objects.all()
+        job=JobForm.objects.all()
         serializer=EmployeeSerializer(job,many=True)
         return Response(serializer.data)
     

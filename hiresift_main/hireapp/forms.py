@@ -1,9 +1,9 @@
 from django import forms
-from .models import ApplicantData,EmployeeForm
+from .models import ApplicantData,JobForm
 
 class JobForm(forms.ModelForm):
     class Meta:
-        model = EmployeeForm
+        model = JobForm
         fields = '__all__'
 
 class ApplicantForm(forms.ModelForm):

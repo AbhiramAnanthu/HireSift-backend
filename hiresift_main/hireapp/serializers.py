@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import EmployeeForm
+from .models import JobForm
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
-        model=EmployeeForm
-        fields = '__all__'
+        model=JobForm
+        fields = ['job_title','job_description','starting_date','ending_date']
