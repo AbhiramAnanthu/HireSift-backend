@@ -5,6 +5,7 @@ from .serializers import EmployeeSerializer,ApplicantSerializer
 from rest_framework import status
 from .models import *
 from .resume import extractor,prompting_storing
+from django.http import JsonResponse
 import uuid
 
 class JobView(APIView):
@@ -44,6 +45,9 @@ class LangView(APIView):
     
 def passing_to_langchain():
     applicants=ApplicantData.objects.all()
+    all_docs=[]
+    document=[]
+    resume_pages=[]
     for applicant in applicants:
         file_name=applicant.get_file_name()
         directory="C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media/"
@@ -53,7 +57,16 @@ def passing_to_langchain():
             "id":id,
             "file_path":file_path
         }
-        document=extractor(docs)
-    user_input="I want to hire a backend developer who has practical knowledge on django flask and also docker."
-    result = prompting_storing(user_input,document)
+        all_docs.append(docs)
+    for doc in all_docs:
+        text=extractor(doc)
+        document.append(text)
+    for page in document:
+        for i in page:
+            resume_pages.append({
+                "id":i.id,
+                "page_content":i.page_content
+            })
+    user_input="I want to hire a backend developer who knows any one of the language python,javascript,or ruby who knows deployment with docker."
+    result=prompting_storing(user_input,resume_pages)
     return result
