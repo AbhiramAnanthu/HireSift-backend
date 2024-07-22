@@ -6,6 +6,7 @@ from rest_framework import status
 from .models import *
 from .resume import extractor,prompting_storing
 from django.http import JsonResponse
+from django.http import FileResponse
 import uuid
 
 class JobView(APIView):
@@ -42,7 +43,9 @@ class LangView(APIView):
     def get(self,request):
         user_input = request.query_params.get('text', None)
         data=passing_to_langchain(user_input)
-        return Response(data)
+        files=getting_sorted_files(data)
+        for file in files:
+            return FileResponse(open(file,'rb'),content_type='application/pdf')
     
 def passing_to_langchain(user_input):
     applicants=ApplicantData.objects.all()
@@ -70,3 +73,14 @@ def passing_to_langchain(user_input):
             })
     result=prompting_storing(user_input,resume_pages)
     return result
+
+def getting_sorted_files(data):
+    files=[]
+    for element in data:
+        id=element.get('id')
+        applicant=ApplicantData.objects.get(application_number=id)
+        file_name=applicant.get_file_name()
+        dir="C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media/"
+        file_path=os.path.join(dir,file_name)
+        files.append(file_path)
+    return files
