@@ -11,3 +11,6 @@ class ApplicantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicantData  # Corrected here
         fields = ['first_name', 'last_name', 'resume', 'appl_email', 'appl_phone','application_number']
+
+
+    

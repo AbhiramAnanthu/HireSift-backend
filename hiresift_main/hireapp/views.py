@@ -40,10 +40,11 @@ class ApplicantView(APIView):
     
 class LangView(APIView):
     def get(self,request):
-        data=passing_to_langchain()
+        user_input = request.query_params.get('text', None)
+        data=passing_to_langchain(user_input)
         return Response(data)
     
-def passing_to_langchain():
+def passing_to_langchain(user_input):
     applicants=ApplicantData.objects.all()
     all_docs=[]
     document=[]
@@ -67,6 +68,5 @@ def passing_to_langchain():
                 "id":i.id,
                 "page_content":i.page_content
             })
-    user_input="I want to hire a backend developer who knows any one of the language python,javascript,or ruby who knows deployment with docker."
     result=prompting_storing(user_input,resume_pages)
     return result
