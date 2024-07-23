@@ -1,0 +1,22 @@
+databases:
+  - name: hiresift_maindb
+    plan: free
+    databaseName: hiresift_main
+    user: hiresift_main
+
+services:
+  - type: web
+    plan: free
+    name: hiresift_main
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "python -m gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hiresift_maindb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
