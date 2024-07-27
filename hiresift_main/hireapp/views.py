@@ -68,7 +68,7 @@ class LangView(APIView):
     def get(self, request):
         user_input = request.query_params.get("text", None)
         data = passing_to_langchain(user_input)
-        return data
+        return HttpResponse(data)
 
 
 def passing_to_langchain(user_input):
