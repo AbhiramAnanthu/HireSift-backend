@@ -3,6 +3,7 @@ from django.utils import timezone
 import os
 
 class JobForm(models.Model):
+    job_id=models.CharField(max_length=20,null=True,unique=True)
     job_title = models.CharField(max_length=255, null=False, blank=True)
     job_description = models.TextField()
     starting_date = models.DateField(default=timezone.now)

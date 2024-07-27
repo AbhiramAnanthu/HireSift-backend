@@ -21,8 +21,13 @@ class JobView(APIView):
         print(request.data)
         serializer = EmployeeSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            id = uuid.uuid4()
+            instance = serializer.create(
+                validated_data={**serializer.validated_data, "job_id": id}
+            )
+            instance.save()
+            response_serializer=EmployeeSerializer(instance)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

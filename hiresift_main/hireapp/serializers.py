@@ -5,7 +5,7 @@ from .models import JobForm, ApplicantData
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobForm
-        fields = ['job_title', 'job_description', 'starting_date', 'ending_date']
+        fields = ['job_title', 'job_description', 'starting_date', 'ending_date','job_id']
     
 class ApplicantSerializer(serializers.ModelSerializer):
     class Meta:
