@@ -5,10 +5,11 @@ from .serializers import EmployeeSerializer, ApplicantSerializer
 from rest_framework import status
 from .models import *
 from .resume import extractor, prompting_storing
-from django.http import FileResponse, HttpResponseNotFound, HttpResponse
+from django.http import FileResponse, HttpResponseNotFound, HttpResponse,JsonResponse
 from tempfile import TemporaryDirectory
 import uuid
 import zipfile
+import json
 
 
 class JobView(APIView):
@@ -33,7 +34,8 @@ class JobView(APIView):
 
 class ApplicantView(APIView):
     def get(self, request):
-        applicant = ApplicantData.objects.all()
+        id=request.query_params.get('job_id',None)
+        applicant = ApplicantData.objects.filter(job_id=id)
         serializer = ApplicantSerializer(applicant, many=True)
         return Response(serializer.data)
 
@@ -52,32 +54,28 @@ class ApplicantView(APIView):
 
 class download_files(APIView):
     def get(self, request):
-        files = getting_sorted_files()
-        with TemporaryDirectory() as tmpdir:
-            zip_file_path = os.path.join(tmpdir, "files.zip")
-            with zipfile.ZipFile(zip_file_path, "w") as zipf:
-                for file in files:
-                    if os.path.exists(file):
-                        zipf.write(file, os.path.basename(file))
-                    else:
-                        return HttpResponseNotFound(f"File not found: {file}")
-
-        # Return the ZIP file as a response
-            with open(zip_file_path, "rb") as f:
-                response = HttpResponse(f.read(), content_type="application/zip")
-                response["Content-Disposition"] = "attachment; filename=files.zip"
-                return response
-
-
+        id=request.query_params.get('applicant_number',None)
+        applicants = ApplicantData.objects.filter(application_number=id)
+        for applicant in applicants:
+            file_name=applicant.get_file_name()
+            dir='C:/Users/aaran/OneDrive/Desktop/HireSift-backend/hiresift_main/media/'
+            file_path=os.path.join(dir,file_name)
+            return FileResponse(open(file_path,'rb'),as_attachment=True,filename=file_name)
+        
 class LangView(APIView):
-    def get(self, request):
-        user_input = request.query_params.get("text", None)
-        data = passing_to_langchain(user_input)
-        return HttpResponse(data)
+  def get(self, request):
+    user_input=request.query_params.get('user_input',None)
+    id=request.query_params.get('id',None)
+    if not id:
+        return HttpResponse("Error: 'id' parameter is required and cannot be empty.", status=400)
+
+    data = passing_to_langchain(user_input, id)
+    json_data = json.dumps(data)
+    return HttpResponse(json_data)
 
 
-def passing_to_langchain(user_input):
-    applicants = ApplicantData.objects.all()
+def passing_to_langchain(user_input,id):
+    applicants = ApplicantData.objects.filter(job_id=id)
     all_docs = []
     document = []
     resume_pages = []

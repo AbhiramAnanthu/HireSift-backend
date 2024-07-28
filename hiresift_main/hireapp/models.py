@@ -22,7 +22,7 @@ class ApplicantData(models.Model):
     appl_phone = models.CharField(max_length=15)
     appl_essay = models.TextField(null=True)
     address=models.CharField(max_length=200,null=True)
-    job= models.ForeignKey(JobForm,on_delete=models.CASCADE,null=True)
+    job_id=models.CharField(max_length=200,null=True)
 
     def get_file_name(self):
         return os.path.basename(self.resume.name)
