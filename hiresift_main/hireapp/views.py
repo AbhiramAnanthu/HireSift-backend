@@ -73,6 +73,17 @@ class LangView(APIView):
     json_data = json.dumps(data)
     return HttpResponse(json_data)
 
+class ApplicantDetails(APIView):
+    def get(self,request):
+        data=[]
+        id=request.query_params.get('id',None)
+        applicants = ApplicantData.objects.filter(application_number=id)
+        for applicant in applicants:
+            data.append({
+                'id':applicant.application_number,
+                'Name':applicant.__str__()
+            })
+        return HttpResponse(data)
 
 def passing_to_langchain(user_input,id):
     applicants = ApplicantData.objects.filter(job_id=id)

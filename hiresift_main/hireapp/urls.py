@@ -6,4 +6,5 @@ urlpatterns=[
     path('jobs/',views.JobView.as_view()),
     path('working/',views.LangView.as_view()),
     path('download-files/',views.download_files.as_view()),
+    path('get-applicant-details/',views.ApplicantDetails.as_view()),
 ]
