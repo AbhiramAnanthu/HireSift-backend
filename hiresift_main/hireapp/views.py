@@ -81,7 +81,9 @@ class ApplicantDetails(APIView):
         for applicant in applicants:
             data.append({
                 'id':applicant.application_number,
-                'Name':applicant.__str__()
+                'Name':applicant.__str__(),
+                'phone':applicant.appl_phone,
+                'email':applicant.appl_email,
             })
         return HttpResponse(data)
 
