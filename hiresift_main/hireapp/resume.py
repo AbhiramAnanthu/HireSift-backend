@@ -6,6 +6,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 import os
+import tempfile
 
 load_dotenv(dotenv_path=".env")
 
@@ -28,13 +29,18 @@ chain = prompt_template | llm
 
 
 def extractor(docs):
-    file_path = docs.get("file_path")
-    loader = PyPDFLoader(file_path)
-    text = loader.load()
-    for obj in text:
-        obj.id = docs.get("id")
-    return text
-
+    with tempfile.NamedTemporaryFile(delete=True, mode='w+', encoding='utf-8', suffix='.txt') as temp_file:
+        file_path = docs.get('file_path')
+        loader = PyPDFLoader(file_path)
+        text = loader.load()
+        for comp in text:
+            temp_file.write(comp.page_content)
+        temp_file.seek(0)
+        content = temp_file.read()
+    return {
+        'id':docs.get('id'),
+        'page_content':content
+    }
 
 def prompting_storing(user_input, document):
     text=[]
@@ -44,7 +50,7 @@ def prompting_storing(user_input, document):
         page_content=doc.get('page_content')
         text.append(page_content)
     store.add_texts(texts=text)
-    result = store.similarity_search_with_score(user_input)
+    result = store.similarity_search_with_score(query=user_input)
     for i, doc in zip(result, document):
         for score_value in i:
             if isinstance(score_value, float):

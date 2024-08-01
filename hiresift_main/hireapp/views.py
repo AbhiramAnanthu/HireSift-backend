@@ -64,12 +64,12 @@ class download_files(APIView):
         
 class LangView(APIView):
   def get(self, request):
-    user_input=request.query_params.get('user_input',None)
+    user_input=request.query_params.get('text',None)
     id=request.query_params.get('id',None)
     if not id:
         return HttpResponse("Error: 'id' parameter is required and cannot be empty.", status=400)
-
-    data = passing_to_langchain(user_input, id)
+    
+    data = passing_to_langchain(user_input,id)
     json_data = json.dumps(data)
     return HttpResponse(json_data)
 
@@ -85,7 +85,8 @@ class ApplicantDetails(APIView):
                 'phone':applicant.appl_phone,
                 'email':applicant.appl_email,
             })
-        return HttpResponse(data)
+            
+        return Response(json.dumps(data))
 
 def passing_to_langchain(user_input,id):
     applicants = ApplicantData.objects.filter(job_id=id)
@@ -104,10 +105,7 @@ def passing_to_langchain(user_input,id):
     for doc in all_docs:
         text = extractor(doc)
         document.append(text)
-    for page in document:
-        for i in page:
-            resume_pages.append({"id": i.id, "page_content": i.page_content})
-    result = prompting_storing(user_input, resume_pages)
+    result = prompting_storing(user_input, document)
     return result
 
 
